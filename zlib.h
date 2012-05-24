@@ -1381,7 +1381,7 @@ ZEXTERN char * ZEXPORT gzgets OF((gzFile file, char *buf, int len));
    buf are indeterminate.
 */
 
-ZEXTERN int ZEXPORT gzputc OF((gzFile file, int c));
+ZEXTERN int ZEXPORT gzputc OF((gzFile file, unsigned char c));
 /*
      Writes c, converted to an unsigned char, into the compressed file.  gzputc
    returns the value that was written, or -1 in case of error.
@@ -1396,7 +1396,7 @@ ZEXTERN int ZEXPORT gzgetc OF((gzFile file));
    points to has been clobbered or not.
 */
 
-ZEXTERN int ZEXPORT gzungetc OF((int c, gzFile file));
+ZEXTERN int ZEXPORT gzungetc OF((signed char c, gzFile file));
 /*
      Push one character back onto the stream to be read as the first character
    on the next read.  At least one character of push-back is allowed.
