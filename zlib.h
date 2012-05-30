@@ -41,7 +41,10 @@
   23May12  jh   Adjusted version strings to adobt the original creators'
                 mandated x.x.x.f version format that is cited in the FAQ
                 located at http://www.zlib.net/zlib_faq.html#faq24.
-
+  24May12  jh   Updated older-style function declarators.
+                Modified constant conditional expressions to be non-constant.
+                Changed deprecated functions to their ANSI equivalents.
+                Carefully adjusted data types to reduce risk of data loss.
 */
 
 #ifndef ZLIB_H

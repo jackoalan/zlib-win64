@@ -11,6 +11,11 @@
 !!!!
 !!!! Changes in 1.2.7.f-hanba-win64-v1 (23 May 2012)
 !!!! - Adjusted version numbers to reflect the altered source distribution
+!!!! - Adjusted function old-declarators to new style.
+!!!! - Modified constant conditional expressions to non-conditional.
+!!!! - Renamed/redefined deprecated functions to their ANSI equivalents.
+!!!! - Adjusted (carefully) data types to reduce risk of data loss.
+!!!! - Created Microsoft Visual Studio 2008 solution & project files.
 !!!!
 
 Changes in 1.2.7 (2 May 2012)
