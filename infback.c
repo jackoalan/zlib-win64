@@ -15,6 +15,12 @@
 #include "inflate.h"
 #include "inffast.h"
 
+#ifdef WIN32
+#define Z_FALSE     (__LINE__ == -1)
+#else
+#define Z_FALSE     0
+#endif
+
 /* function prototypes */
 local void fixedtables OF((struct inflate_state FAR *state));
 
@@ -25,7 +31,16 @@ local void fixedtables OF((struct inflate_state FAR *state));
    windowBits is in the range 8..15, and window is a user-supplied
    window and output buffer that is 2**windowBits bytes.
  */
+#ifdef WIN32
 int ZEXPORT inflateBackInit_(z_streamp strm, int windowBits, unsigned char FAR *window, const char *version, int stream_size)
+#else
+int ZEXPORT inflateBackInit_(strm, windowBits, window, version, stream_size)
+z_streamp strm;
+int windowBits;
+unsigned char FAR *window;
+const char *version;
+int stream_size;
+#endif
 {
     struct inflate_state FAR *state;
 
@@ -74,7 +89,12 @@ int ZEXPORT inflateBackInit_(z_streamp strm, int windowBits, unsigned char FAR *
    used for threaded applications, since the rewriting of the tables and virgin
    may not be thread-safe.
  */
+#ifdef WIN32
 local void fixedtables(struct inflate_state FAR *state)
+#else
+local void fixedtables(state)
+struct inflate_state FAR *state;
+#endif
 {
 #ifdef BUILDFIXED
     static int virgin = 1;
@@ -120,53 +140,65 @@ local void fixedtables(struct inflate_state FAR *state)
 
 /* Load returned state from inflate_fast() */
 #define LOAD() \
-    put = strm->next_out; \
-    left = strm->avail_out; \
-    next = strm->next_in; \
-    have = strm->avail_in; \
-    hold = state->hold; \
-    bits = state->bits;
+    do { \
+        put = strm->next_out; \
+        left = strm->avail_out; \
+        next = strm->next_in; \
+        have = strm->avail_in; \
+        hold = state->hold; \
+        bits = state->bits; \
+    } while (Z_FALSE)
 
 /* Set state from registers for inflate_fast() */
 #define RESTORE() \
-    strm->next_out = put; \
-    strm->avail_out = left; \
-    strm->next_in = next; \
-    strm->avail_in = have; \
-    state->hold = hold; \
-    state->bits = bits;
+    do { \
+        strm->next_out = put; \
+        strm->avail_out = left; \
+        strm->next_in = next; \
+        strm->avail_in = have; \
+        state->hold = hold; \
+        state->bits = bits; \
+    } while (Z_FALSE)
 
 /* Clear the input bit accumulator */
 #define INITBITS() \
-    hold = 0; \
-    bits = 0;
+    do { \
+        hold = 0; \
+        bits = 0; \
+    } while (Z_FALSE)
 
 /* Assure that some input is available.  If input is requested, but denied,
    then return a Z_BUF_ERROR from inflateBack(). */
 #define PULL() \
-    if (have == 0) { \
-        have = in(in_desc, &next); \
+    do { \
         if (have == 0) { \
-            next = Z_NULL; \
-            ret = Z_BUF_ERROR; \
-            goto inf_leave; \
+            have = in(in_desc, &next); \
+            if (have == 0) { \
+                next = Z_NULL; \
+                ret = Z_BUF_ERROR; \
+                goto inf_leave; \
+            } \
         } \
-    }
+    } while (Z_FALSE)
 
 /* Get a byte of input into the bit accumulator, or return from inflateBack()
    with an error if there is no input available. */
 #define PULLBYTE() \
-    PULL(); \
-    have--; \
-    hold += (unsigned long)(*next++) << bits; \
-    bits += 8;
+    do { \
+        PULL(); \
+        have--; \
+        hold += (unsigned long)(*next++) << bits; \
+        bits += 8; \
+    } while (Z_FALSE)
 
 /* Assure that there are at least n bits in the bit accumulator.  If there is
    not enough available input to do that, then return from inflateBack() with
    an error. */
 #define NEEDBITS(n) \
-    while (bits < (unsigned)(n)) \
-        PULLBYTE();
+    do { \
+        while (bits < (unsigned)(n)) \
+            PULLBYTE(); \
+    } while (Z_FALSE)
 
 /* Return the low n bits of the bit accumulator (n < 16) */
 #define BITS(n) \
@@ -174,27 +206,33 @@ local void fixedtables(struct inflate_state FAR *state)
 
 /* Remove n bits from the bit accumulator */
 #define DROPBITS(n) \
-    hold >>= (n); \
-    bits -= (unsigned)(n);
+    do { \
+        hold >>= (n); \
+        bits -= (unsigned)(n); \
+    } while (Z_FALSE)
 
 /* Remove zero to seven bits as needed to go to a byte boundary */
 #define BYTEBITS() \
-    hold >>= bits & 7; \
-    bits -= bits & 7; \
+    do { \
+        hold >>= bits & 7; \
+        bits -= bits & 7; \
+    } while (Z_FALSE)
 
 /* Assure that some output space is available, by writing out the window
    if it's full.  If the write fails, return from inflateBack() with a
    Z_BUF_ERROR. */
 #define ROOM() \
-    if (left == 0) { \
-        put = state->window; \
-        left = state->wsize; \
-        state->whave = left; \
-        if (out(out_desc, put, left)) { \
-            ret = Z_BUF_ERROR; \
-            goto inf_leave; \
+    do { \
+        if (left == 0) { \
+            put = state->window; \
+            left = state->wsize; \
+            state->whave = left; \
+            if (out(out_desc, put, left)) { \
+                ret = Z_BUF_ERROR; \
+                goto inf_leave; \
+            } \
         } \
-    }
+    } while (Z_FALSE)
 
 /*
    strm provides the memory allocation functions and window buffer on input,
@@ -223,7 +261,16 @@ local void fixedtables(struct inflate_state FAR *state)
    inflateBack() can also return Z_STREAM_ERROR if the input parameters
    are not correct, i.e. strm is Z_NULL or the state was not initialized.
  */
+#ifdef WIN32
 int ZEXPORT inflateBack(z_streamp strm, in_func in, void FAR *in_desc, out_func out, void FAR *out_desc)
+#else
+int ZEXPORT inflateBack(strm, in, in_desc, out, out_desc)
+z_streamp strm;
+in_func in;
+void FAR *in_desc;
+out_func out;
+void FAR *out_desc;
+#endif
 {
     struct inflate_state FAR *state;
     unsigned char FAR *next;    /* next input */
@@ -599,7 +646,12 @@ int ZEXPORT inflateBack(z_streamp strm, in_func in, void FAR *in_desc, out_func 
     return ret;
 }
 
+#ifdef WIN32
 int ZEXPORT inflateBackEnd(z_streamp strm)
+#else
+int ZEXPORT inflateBackEnd(strm)
+z_streamp strm;
+#endif
 {
     if (strm == Z_NULL || strm->state == Z_NULL || strm->zfree == (free_func)0)
         return Z_STREAM_ERROR;

@@ -91,6 +91,12 @@
 #  endif
 #endif
 
+#ifdef WIN32
+#define Z_FALSE     (__LINE__ == -1)
+#else
+#define Z_FALSE     0
+#endif
+
 /* function prototypes */
 local void fixedtables OF((struct inflate_state FAR *state));
 local int updatewindow OF((z_streamp strm, unsigned out));
@@ -100,7 +106,12 @@ local int updatewindow OF((z_streamp strm, unsigned out));
 local unsigned syncsearch OF((unsigned FAR *have, unsigned char FAR *buf,
                               unsigned len));
 
+#ifdef WIN32
 int ZEXPORT inflateResetKeep(z_streamp strm)
+#else
+int ZEXPORT inflateResetKeep(strm)
+z_streamp strm;
+#endif
 {
     struct inflate_state FAR *state;
 
@@ -124,7 +135,12 @@ int ZEXPORT inflateResetKeep(z_streamp strm)
     return Z_OK;
 }
 
+#ifdef WIN32
 int ZEXPORT inflateReset(z_streamp strm)
+#else
+int ZEXPORT inflateReset(strm)
+z_streamp strm;
+#endif
 {
     struct inflate_state FAR *state;
 
@@ -136,7 +152,13 @@ int ZEXPORT inflateReset(z_streamp strm)
     return inflateResetKeep(strm);
 }
 
+#ifdef WIN32
 int ZEXPORT inflateReset2(z_streamp strm, int windowBits)
+#else
+int ZEXPORT inflateReset2(strm, windowBits)
+z_streamp strm;
+int windowBits;
+#endif
 {
     int wrap;
     struct inflate_state FAR *state;
@@ -172,7 +194,15 @@ int ZEXPORT inflateReset2(z_streamp strm, int windowBits)
     return inflateReset(strm);
 }
 
+#ifdef WIN32
 int ZEXPORT inflateInit2_(z_streamp strm, int windowBits, const char *version, int stream_size)
+#else
+int ZEXPORT inflateInit2_(strm, windowBits, version, stream_size)
+z_streamp strm;
+int windowBits;
+const char *version;
+int stream_size;
+#endif
 {
     int ret;
     struct inflate_state FAR *state;
@@ -210,12 +240,26 @@ int ZEXPORT inflateInit2_(z_streamp strm, int windowBits, const char *version, i
     return ret;
 }
 
+#ifdef WIN32
 int ZEXPORT inflateInit_(z_streamp strm, const char *version, int stream_size)
+#else
+int ZEXPORT inflateInit_(strm, version, stream_size)
+z_streamp strm;
+const char *version;
+int stream_size;
+#endif
 {
     return inflateInit2_(strm, DEF_WBITS, version, stream_size);
 }
 
+#ifdef WIN32
 int ZEXPORT inflatePrime(z_streamp strm, int bits, int value)
+#else
+int ZEXPORT inflatePrime(strm, bits, value)
+z_streamp strm;
+int bits;
+int value;
+#endif
 {
     struct inflate_state FAR *state;
 
@@ -243,7 +287,12 @@ int ZEXPORT inflatePrime(z_streamp strm, int bits, int value)
    used for threaded applications, since the rewriting of the tables and virgin
    may not be thread-safe.
  */
+#ifdef WIN32
 local void fixedtables(struct inflate_state FAR *state)
+#else
+local void fixedtables(state)
+struct inflate_state FAR *state;
+#endif
 {
 #ifdef BUILDFIXED
     static int virgin = 1;
@@ -360,7 +409,13 @@ void makefixed()
    output will fall in the output data, making match copies simpler and faster.
    The advantage may be dependent on the size of the processor's data caches.
  */
-local int updatewindow(z_streamp strm, unsigned int out)
+#ifdef WIN32
+local int updatewindow(z_streamp strm, unsigned out)
+#else
+local int updatewindow(strm, out)
+z_streamp strm;
+unsigned out;
+#endif
 {
     struct inflate_state FAR *state;
     unsigned copy, dist;
@@ -421,54 +476,68 @@ local int updatewindow(z_streamp strm, unsigned int out)
 /* check macros for header crc */
 #ifdef GUNZIP
 #  define CRC2(check, word) \
-    hbuf[0] = (unsigned char)(word); \
-    hbuf[1] = (unsigned char)((word) >> 8); \
-    check = crc32(check, hbuf, 2);
+    do { \
+        hbuf[0] = (unsigned char)(word); \
+        hbuf[1] = (unsigned char)((word) >> 8); \
+        check = crc32(check, hbuf, 2); \
+    } while (Z_FALSE)
 
 #  define CRC4(check, word) \
-    hbuf[0] = (unsigned char)(word); \
-    hbuf[1] = (unsigned char)((word) >> 8); \
-    hbuf[2] = (unsigned char)((word) >> 16); \
-    hbuf[3] = (unsigned char)((word) >> 24); \
-    check = crc32(check, hbuf, 4);
+    do { \
+        hbuf[0] = (unsigned char)(word); \
+        hbuf[1] = (unsigned char)((word) >> 8); \
+        hbuf[2] = (unsigned char)((word) >> 16); \
+        hbuf[3] = (unsigned char)((word) >> 24); \
+        check = crc32(check, hbuf, 4); \
+    } while (Z_FALSE)
 #endif
 
 /* Load registers with state in inflate() for speed */
 #define LOAD() \
-    put = strm->next_out; \
-    left = strm->avail_out; \
-    next = strm->next_in; \
-    have = strm->avail_in; \
-    hold = state->hold; \
-    bits = state->bits;
+    do { \
+        put = strm->next_out; \
+        left = strm->avail_out; \
+        next = strm->next_in; \
+        have = strm->avail_in; \
+        hold = state->hold; \
+        bits = state->bits; \
+    } while (Z_FALSE)
 
 /* Restore state from registers in inflate() */
 #define RESTORE() \
-    strm->next_out = put; \
-    strm->avail_out = left; \
-    strm->next_in = next; \
-    strm->avail_in = have; \
-    state->hold = hold; \
-    state->bits = bits;
+    do { \
+        strm->next_out = put; \
+        strm->avail_out = left; \
+        strm->next_in = next; \
+        strm->avail_in = have; \
+        state->hold = hold; \
+        state->bits = bits; \
+    } while (Z_FALSE)
 
 /* Clear the input bit accumulator */
 #define INITBITS() \
-    hold = 0; \
-    bits = 0;
+    do { \
+        hold = 0; \
+        bits = 0; \
+    } while (Z_FALSE)
 
 /* Get a byte of input into the bit accumulator, or return from inflate()
    if there is no input available. */
 #define PULLBYTE() \
-    if (have == 0) goto inf_leave; \
-    have--; \
-    hold += (unsigned long)(*next++) << bits; \
-    bits += 8;
+    do { \
+        if (have == 0) goto inf_leave; \
+        have--; \
+        hold += (unsigned long)(*next++) << bits; \
+        bits += 8; \
+    } while (Z_FALSE)
 
 /* Assure that there are at least n bits in the bit accumulator.  If there is
    not enough available input to do that, then return from inflate(). */
 #define NEEDBITS(n) \
-    while (bits < (unsigned)(n)) \
-        PULLBYTE();
+    do { \
+        while (bits < (unsigned)(n)) \
+            PULLBYTE(); \
+    } while (Z_FALSE)
 
 /* Return the low n bits of the bit accumulator (n < 16) */
 #define BITS(n) \
@@ -476,13 +545,17 @@ local int updatewindow(z_streamp strm, unsigned int out)
 
 /* Remove n bits from the bit accumulator */
 #define DROPBITS(n) \
-    hold >>= (n); \
-    bits -= (unsigned)(n);
+    do { \
+        hold >>= (n); \
+        bits -= (unsigned)(n); \
+    } while (Z_FALSE)
 
 /* Remove zero to seven bits as needed to go to a byte boundary */
 #define BYTEBITS() \
-    hold >>= bits & 7; \
-    bits -= bits & 7;
+    do { \
+        hold >>= bits & 7; \
+        bits -= bits & 7; \
+    } while (Z_FALSE)
 
 /*
    inflate() uses a state machine to process as much input data and generate as
@@ -566,7 +639,13 @@ local int updatewindow(z_streamp strm, unsigned int out)
    will return Z_BUF_ERROR if it has not reached the end of the stream.
  */
 
+#ifdef WIN32
 int ZEXPORT inflate(z_streamp strm, int flush)
+#else
+int ZEXPORT inflate(strm, flush)
+z_streamp strm;
+int flush;
+#endif
 {
     struct inflate_state FAR *state;
     unsigned char FAR *next;    /* next input */
@@ -723,7 +802,7 @@ int ZEXPORT inflate(z_streamp strm, int flush)
                     if (state->head != Z_NULL &&
                             state->head->name != Z_NULL &&
                             state->length < state->head->name_max)
-                        state->head->name[state->length++] = (Bytef) len;
+                        state->head->name[state->length++] = len;
                 } while (len && copy < have);
                 if (state->flags & 0x0200)
                     state->check = crc32(state->check, next, copy);
@@ -744,7 +823,7 @@ int ZEXPORT inflate(z_streamp strm, int flush)
                     if (state->head != Z_NULL &&
                             state->head->comment != Z_NULL &&
                             state->length < state->head->comm_max)
-                        state->head->comment[state->length++] = (Bytef) len;
+                        state->head->comment[state->length++] = len;
                 } while (len && copy < have);
                 if (state->flags & 0x0200)
                     state->check = crc32(state->check, next, copy);
@@ -1213,7 +1292,12 @@ int ZEXPORT inflate(z_streamp strm, int flush)
     return ret;
 }
 
+#ifdef WIN32
 int ZEXPORT inflateEnd(z_streamp strm)
+#else
+int ZEXPORT inflateEnd(strm)
+z_streamp strm;
+#endif
 {
     struct inflate_state FAR *state;
     if (strm == Z_NULL || strm->state == Z_NULL || strm->zfree == (free_func)0)
@@ -1226,7 +1310,14 @@ int ZEXPORT inflateEnd(z_streamp strm)
     return Z_OK;
 }
 
+#ifdef WIN32
 int ZEXPORT inflateSetDictionary(z_streamp strm, const Bytef *dictionary, uInt dictLength)
+#else
+int ZEXPORT inflateSetDictionary(strm, dictionary, dictLength)
+z_streamp strm;
+const Bytef *dictionary;
+uInt dictLength;
+#endif
 {
     struct inflate_state FAR *state;
     unsigned long dictid;
@@ -1266,7 +1357,13 @@ int ZEXPORT inflateSetDictionary(z_streamp strm, const Bytef *dictionary, uInt d
     return Z_OK;
 }
 
+#ifdef WIN32
 int ZEXPORT inflateGetHeader(z_streamp strm, gz_headerp head)
+#else
+int ZEXPORT inflateGetHeader(strm, head)
+z_streamp strm;
+gz_headerp head;
+#endif
 {
     struct inflate_state FAR *state;
 
@@ -1292,7 +1389,14 @@ int ZEXPORT inflateGetHeader(z_streamp strm, gz_headerp head)
    called again with more data and the *have state.  *have is initialized to
    zero for the first call.
  */
-local unsigned int syncsearch(unsigned int FAR *have, unsigned char FAR *buf, unsigned int len)
+#ifdef WIN32
+local unsigned syncsearch(unsigned FAR *have, unsigned char FAR *buf, unsigned len)
+#else
+local unsigned syncsearch(have, buf, len)
+unsigned FAR *have;
+unsigned char FAR *buf;
+unsigned len;
+#endif
 {
     unsigned got;
     unsigned next;
@@ -1312,7 +1416,12 @@ local unsigned int syncsearch(unsigned int FAR *have, unsigned char FAR *buf, un
     return next;
 }
 
+#ifdef WIN32
 int ZEXPORT inflateSync(z_streamp strm)
+#else
+int ZEXPORT inflateSync(strm)
+z_streamp strm;
+#endif
 {
     unsigned len;               /* number of bytes to look at or looked at */
     unsigned long in, out;      /* temporary to save total_in and total_out */
@@ -1362,7 +1471,12 @@ int ZEXPORT inflateSync(z_streamp strm)
    block. When decompressing, PPP checks that at the end of input packet,
    inflate is waiting for these length bytes.
  */
+#ifdef WIN32
 int ZEXPORT inflateSyncPoint(z_streamp strm)
+#else
+int ZEXPORT inflateSyncPoint(strm)
+z_streamp strm;
+#endif
 {
     struct inflate_state FAR *state;
 
@@ -1371,7 +1485,13 @@ int ZEXPORT inflateSyncPoint(z_streamp strm)
     return state->mode == STORED && state->bits == 0;
 }
 
+#ifdef WIN32
 int ZEXPORT inflateCopy(z_streamp dest, z_streamp source)
+#else
+int ZEXPORT inflateCopy(dest, source)
+z_streamp dest;
+z_streamp source;
+#endif
 {
     struct inflate_state FAR *state;
     struct inflate_state FAR *copy;
@@ -1416,7 +1536,13 @@ int ZEXPORT inflateCopy(z_streamp dest, z_streamp source)
     return Z_OK;
 }
 
+#ifdef WIN32
 int ZEXPORT inflateUndermine(z_streamp strm, int subvert)
+#else
+int ZEXPORT inflateUndermine(strm, subvert)
+z_streamp strm;
+int subvert;
+#endif
 {
     struct inflate_state FAR *state;
 
@@ -1431,7 +1557,12 @@ int ZEXPORT inflateUndermine(z_streamp strm, int subvert)
 #endif
 }
 
+#ifdef WIN32
 long ZEXPORT inflateMark(z_streamp strm)
+#else
+long ZEXPORT inflateMark(strm)
+z_streamp strm;
+#endif
 {
     struct inflate_state FAR *state;
 

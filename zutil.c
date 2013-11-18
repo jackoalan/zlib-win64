@@ -133,7 +133,12 @@ void ZLIB_INTERNAL z_error (m)
 /* exported to allow conversion of error code to string for compress() and
  * uncompress()
  */
+#ifdef WIN32
 const char * ZEXPORT zError(int err)
+#else
+const char * ZEXPORT zError(err)
+    int err;
+#endif
 {
     return ERR_MSG(err);
 }
@@ -300,14 +305,27 @@ extern voidp  calloc OF((uInt items, uInt size));
 extern void   free   OF((voidpf ptr));
 #endif
 
+#ifdef WIN32
 voidpf ZLIB_INTERNAL zcalloc (voidpf opaque, unsigned items, unsigned size)
+#else
+voidpf ZLIB_INTERNAL zcalloc (opaque, items, size)
+    voidpf opaque;
+    unsigned items;
+    unsigned size;
+#endif
 {
     if (opaque) items += size - size; /* make compiler happy */
     return sizeof(uInt) > 2 ? (voidpf)malloc(items * size) :
                               (voidpf)calloc(items, size);
 }
 
+#ifdef WIN32
 void ZLIB_INTERNAL zcfree (voidpf opaque, voidpf ptr)
+#else
+void ZLIB_INTERNAL zcfree (opaque, ptr)
+    voidpf opaque;
+    voidpf ptr;
+#endif
 {
     free(ptr);
     if (opaque) return; /* make compiler happy */
