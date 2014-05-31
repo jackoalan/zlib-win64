@@ -210,10 +210,6 @@ unsigned long ZEXPORT crc32(crc, buf, len)
     uInt len;
 #endif
 {
-#ifdef BYFOUR
-    z_crc_t endian = 1;
-#endif /* BYFOUR */
-
     if (buf == Z_NULL) return 0UL;
 
 #ifdef DYNAMIC_CRC_TABLE
@@ -222,11 +218,21 @@ unsigned long ZEXPORT crc32(crc, buf, len)
 #endif /* DYNAMIC_CRC_TABLE */
 
 #ifdef BYFOUR
-    if (*((unsigned char *)(&endian)))
-        return crc32_little(crc, buf, len);
-    else
-        return crc32_big(crc, buf, len);
+#ifdef WIN32
+    int size_match = (sizeof(void *) == sizeof(ptrdiff_t));
+    if (size_match) {
 #else
+    if (sizeof(void *) == sizeof(ptrdiff_t)) {
+#endif /* WIN32 */
+       z_crc_t endian;
+
+           endian = 1;
+       if (*((unsigned char *)(&endian)))
+            return crc32_little(crc, buf, len);
+       else
+            return crc32_big(crc, buf, len);
+    }
+#endif /* BYFOUR */
     crc = crc ^ 0xffffffffUL;
     while (len >= 8) {
         DO8;
@@ -236,7 +242,6 @@ unsigned long ZEXPORT crc32(crc, buf, len)
         DO1;
     } while (--len);
     return crc ^ 0xffffffffUL;
-#endif /* BYFOUR */
 }
 
 #ifdef BYFOUR

@@ -91,10 +91,21 @@
 #  endif
 #endif
 
+/*
 #ifdef WIN32
 #define Z_FALSE     (__LINE__ == -1)
 #else
 #define Z_FALSE     0
+#endif
+*/
+
+#ifdef WIN32
+#  define Z_ONCE __pragma( warning(push) ) \
+    __pragma(warning(disable:4127)) \
+while (0) \
+    __pragma(warning(pop))
+#else
+#  define Z_ONCE while( 0 )
 #endif
 
 /* function prototypes */
@@ -480,7 +491,7 @@ unsigned out;
         hbuf[0] = (unsigned char)(word); \
         hbuf[1] = (unsigned char)((word) >> 8); \
         check = crc32(check, hbuf, 2); \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 #  define CRC4(check, word) \
     do { \
@@ -489,7 +500,7 @@ unsigned out;
         hbuf[2] = (unsigned char)((word) >> 16); \
         hbuf[3] = (unsigned char)((word) >> 24); \
         check = crc32(check, hbuf, 4); \
-    } while (Z_FALSE)
+    } Z_ONCE
 #endif
 
 /* Load registers with state in inflate() for speed */
@@ -501,7 +512,7 @@ unsigned out;
         have = strm->avail_in; \
         hold = state->hold; \
         bits = state->bits; \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Restore state from registers in inflate() */
 #define RESTORE() \
@@ -512,14 +523,14 @@ unsigned out;
         strm->avail_in = have; \
         state->hold = hold; \
         state->bits = bits; \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Clear the input bit accumulator */
 #define INITBITS() \
     do { \
         hold = 0; \
         bits = 0; \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Get a byte of input into the bit accumulator, or return from inflate()
    if there is no input available. */
@@ -529,7 +540,7 @@ unsigned out;
         have--; \
         hold += (unsigned long)(*next++) << bits; \
         bits += 8; \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Assure that there are at least n bits in the bit accumulator.  If there is
    not enough available input to do that, then return from inflate(). */
@@ -537,7 +548,7 @@ unsigned out;
     do { \
         while (bits < (unsigned)(n)) \
             PULLBYTE(); \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Return the low n bits of the bit accumulator (n < 16) */
 #define BITS(n) \
@@ -548,14 +559,14 @@ unsigned out;
     do { \
         hold >>= (n); \
         bits -= (unsigned)(n); \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Remove zero to seven bits as needed to go to a byte boundary */
 #define BYTEBITS() \
     do { \
         hold >>= bits & 7; \
         bits -= bits & 7; \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /*
    inflate() uses a state machine to process as much input data and generate as
@@ -802,7 +813,7 @@ int flush;
                     if (state->head != Z_NULL &&
                             state->head->name != Z_NULL &&
                             state->length < state->head->name_max)
-                        state->head->name[state->length++] = len;
+                        state->head->name[state->length++] = (Bytef)(len & 0xFF);
                 } while (len && copy < have);
                 if (state->flags & 0x0200)
                     state->check = crc32(state->check, next, copy);
@@ -823,7 +834,7 @@ int flush;
                     if (state->head != Z_NULL &&
                             state->head->comment != Z_NULL &&
                             state->length < state->head->comm_max)
-                        state->head->comment[state->length++] = len;
+                        state->head->comment[state->length++] = (Bytef)(len & 0xFF);
                 } while (len && copy < have);
                 if (state->flags & 0x0200)
                     state->check = crc32(state->check, next, copy);

@@ -32,9 +32,9 @@
 
 
 /* 
-  version 1.2.7.f-hanba-win64, May 23, 2012
+  version 1.2.7.f-hanba-win64-v3, May 31, 2014
 
-  Copyright (C) 2012 Jonathan Hanba (hanbaj@gmail.com)
+  Copyright (C) 2012-2014 Jonathan Hanba (hanbaj@gmail.com)
 
   Date     Who  Comment
   -------  ---  ------------------------------------------------------------
@@ -45,6 +45,12 @@
                 Modified constant conditional expressions to be non-constant.
                 Changed deprecated functions to their ANSI equivalents.
                 Carefully adjusted data types to reduce risk of data loss.
+  17Nov13  jh   Added older-style function declarations back in the source.
+                Added a WIN32 preprocessor check to the function declarations.
+                Changed version to 1.2.7.f-hanba-win64-v2.
+  31May14  jh   Corrected infinite loop errors created by modifying while(0)
+                statements for Windows in source files inflate.c and infback.c.
+                Changed version to 1.2.7.f-hanba-win64-v3.
 */
 
 #ifndef ZLIB_H
@@ -56,7 +62,7 @@
 extern "C" {
 #endif
 
-#define ZLIB_VERSION "1.2.7.f-hanba-win64-v1"
+#define ZLIB_VERSION "1.2.7.f-hanba-win64-v3"
 #define ZLIB_VERNUM 0x127f
 #define ZLIB_VER_MAJOR 1
 #define ZLIB_VER_MINOR 2
@@ -1384,7 +1390,11 @@ ZEXTERN char * ZEXPORT gzgets OF((gzFile file, char *buf, int len));
    buf are indeterminate.
 */
 
+#ifdef WIN32
 ZEXTERN int ZEXPORT gzputc OF((gzFile file, unsigned char c));
+#else
+ZEXTERN int ZEXPORT gzputc OF((gzFile file, int c));
+#endif
 /*
      Writes c, converted to an unsigned char, into the compressed file.  gzputc
    returns the value that was written, or -1 in case of error.
@@ -1399,7 +1409,11 @@ ZEXTERN int ZEXPORT gzgetc OF((gzFile file));
    points to has been clobbered or not.
 */
 
+#ifdef WIN32
 ZEXTERN int ZEXPORT gzungetc OF((signed char c, gzFile file));
+#else
+ZEXTERN int ZEXPORT gzungetc OF((int c, gzFile file));
+#endif
 /*
      Push one character back onto the stream to be read as the first character
    on the next read.  At least one character of push-back is allowed.

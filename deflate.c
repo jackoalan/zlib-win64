@@ -53,7 +53,7 @@
 
 const char deflate_copyright[] =
 // " deflate 1.2.7 Copyright 1995-2012 Jean-loup Gailly and Mark Adler ";
-   " deflate 1.2.7.f-hanba-win64 Copyright (C) 2012 Jonathan Hanba";
+   " deflate 1.2.7.f-hanba-win64 Copyright (C) 2012-2014 Jonathan Hanba";
 /*
   If you use the zlib library in a product, an acknowledgment is welcome
   in the documentation of your product. If for some reason you cannot

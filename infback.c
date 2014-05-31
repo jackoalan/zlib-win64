@@ -15,10 +15,21 @@
 #include "inflate.h"
 #include "inffast.h"
 
+/*
 #ifdef WIN32
 #define Z_FALSE     (__LINE__ == -1)
 #else
 #define Z_FALSE     0
+#endif
+*/
+
+#ifdef WIN32
+#  define Z_ONCE __pragma( warning(push) ) \
+    __pragma(warning(disable:4127)) \
+while (0) \
+    __pragma(warning(pop))
+#else
+#  define Z_ONCE while( 0 )
 #endif
 
 /* function prototypes */
@@ -147,7 +158,7 @@ struct inflate_state FAR *state;
         have = strm->avail_in; \
         hold = state->hold; \
         bits = state->bits; \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Set state from registers for inflate_fast() */
 #define RESTORE() \
@@ -158,14 +169,14 @@ struct inflate_state FAR *state;
         strm->avail_in = have; \
         state->hold = hold; \
         state->bits = bits; \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Clear the input bit accumulator */
 #define INITBITS() \
     do { \
         hold = 0; \
         bits = 0; \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Assure that some input is available.  If input is requested, but denied,
    then return a Z_BUF_ERROR from inflateBack(). */
@@ -179,7 +190,7 @@ struct inflate_state FAR *state;
                 goto inf_leave; \
             } \
         } \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Get a byte of input into the bit accumulator, or return from inflateBack()
    with an error if there is no input available. */
@@ -189,7 +200,7 @@ struct inflate_state FAR *state;
         have--; \
         hold += (unsigned long)(*next++) << bits; \
         bits += 8; \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Assure that there are at least n bits in the bit accumulator.  If there is
    not enough available input to do that, then return from inflateBack() with
@@ -198,7 +209,7 @@ struct inflate_state FAR *state;
     do { \
         while (bits < (unsigned)(n)) \
             PULLBYTE(); \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Return the low n bits of the bit accumulator (n < 16) */
 #define BITS(n) \
@@ -209,14 +220,14 @@ struct inflate_state FAR *state;
     do { \
         hold >>= (n); \
         bits -= (unsigned)(n); \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Remove zero to seven bits as needed to go to a byte boundary */
 #define BYTEBITS() \
     do { \
         hold >>= bits & 7; \
         bits -= bits & 7; \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /* Assure that some output space is available, by writing out the window
    if it's full.  If the write fails, return from inflateBack() with a
@@ -232,7 +243,7 @@ struct inflate_state FAR *state;
                 goto inf_leave; \
             } \
         } \
-    } while (Z_FALSE)
+    } Z_ONCE
 
 /*
    strm provides the memory allocation functions and window buffer on input,

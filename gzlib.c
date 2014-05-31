@@ -321,7 +321,6 @@ gzFile ZEXPORT gzopen_w(path, mode)
 {
     return gz_open(path, -2, mode);
 }
-#endif
 
 /* -- see zlib.h -- */
 #ifdef WIN32

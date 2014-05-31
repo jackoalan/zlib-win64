@@ -10,7 +10,7 @@
 
 const char inflate_copyright[] =
 // " inflate 1.2.7 Copyright 1995-2012 Mark Adler ";
-   " inflate 1.2.7.f-hanba-win64 Copyright (C) 2012 Jonathan Hanba";
+   " inflate 1.2.7.f-hanba-win64 Copyright (C) 2012-14 Jonathan Hanba";
 /*
   If you use the zlib library in a product, an acknowledgment is welcome
   in the documentation of your product. If for some reason you cannot
