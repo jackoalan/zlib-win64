@@ -9,6 +9,14 @@
 !!!! The purpose of the changes made herein were to specifically address
 !!!! compiler errors and warnings in a Microsoft Windows build environment.
 !!!!
+!!!! Changes in 1.2.7.f-hanba-win64-v3 (31 May 2014)
+!!!! - Corrected infinite loop errors in inflate.c and infback.c
+!!!! - Added ZLibTest project to MSVS 2013 solution.
+!!!!
+!!!! Changes in 1.2.7.f-hanba-win64-v2 (17 November 2013)
+!!!! - Reverted function definitions and added preprocessor WIN32 check.
+!!!! - Created Microsoft Visual Studio 2012 & 2013 solution & project files.
+!!!!
 !!!! Changes in 1.2.7.f-hanba-win64-v1 (23 May 2012)
 !!!! - Adjusted version numbers to reflect the altered source distribution
 !!!! - Adjusted function old-declarators to new style.
