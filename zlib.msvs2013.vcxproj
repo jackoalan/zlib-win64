@@ -97,15 +97,18 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>
+      </BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader />
       <PrecompiledHeaderOutputFile>x64\Debug\zlib.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>x64\Debug\</AssemblerListingLocation>
       <ObjectFileName>x64\Debug\</ObjectFileName>
       <ProgramDataBaseFileName>x64\Debug\</ProgramDataBaseFileName>
-      <WarningLevel>Level4</WarningLevel>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>
+      </WarningLevel>
+      <TreatWarningAsError>
+      </TreatWarningAsError>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -124,16 +127,19 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>
+      </BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <PrecompiledHeaderOutputFile>x64\Debug\zlib.pch</PrecompiledHeaderOutputFile>
       <AssemblerListingLocation>x64\Debug\</AssemblerListingLocation>
       <ObjectFileName>x64\Debug\</ObjectFileName>
       <ProgramDataBaseFileName>x64\Debug\</ProgramDataBaseFileName>
-      <WarningLevel>Level4</WarningLevel>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>
+      </WarningLevel>
+      <TreatWarningAsError>
+      </TreatWarningAsError>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
@@ -163,8 +169,10 @@
       <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
       <ObjectFileName>x64\Release\</ObjectFileName>
       <ProgramDataBaseFileName>x64\Release\</ProgramDataBaseFileName>
-      <WarningLevel>Level4</WarningLevel>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>
+      </WarningLevel>
+      <TreatWarningAsError>
+      </TreatWarningAsError>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -195,8 +203,10 @@
       <AssemblerListingLocation>x64\Release\</AssemblerListingLocation>
       <ObjectFileName>x64\Release\</ObjectFileName>
       <ProgramDataBaseFileName>x64\Release\</ProgramDataBaseFileName>
-      <WarningLevel>Level4</WarningLevel>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <WarningLevel>
+      </WarningLevel>
+      <TreatWarningAsError>
+      </TreatWarningAsError>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <CompileAs>Default</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
